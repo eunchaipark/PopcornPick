@@ -1,0 +1,38 @@
+# 환경변수
+.env
+
+# 데이터
+data/raw/
+data/processed/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+postgres_data/
+
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# 로그
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
