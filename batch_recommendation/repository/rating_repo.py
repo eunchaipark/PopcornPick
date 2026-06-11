@@ -5,17 +5,19 @@ def fetch_als_input():
     try:
         cur = conn.cursor()
         cur.execute("""
-                    SELECT user_id, movie_id, MAX(rating) AS rating
-                    FROM (SELECT user_id, movie_id, rating
-                          FROM ratings
-
-                          UNION ALL
-
-                          SELECT user_id, movie_id, rating_value AS rating
-                          FROM user_click_logs
-                          WHERE action_type = 'RATING'
-                            AND rating_value IS NOT NULL) combined
-                    GROUP BY user_id, movie_id
+                    SELECT DISTINCT
+                    ON (user_id, movie_id)
+                        user_id, movie_id, rating
+                    FROM (
+                        SELECT user_id, movie_id, rating, rated_at AS ts
+                        FROM ratings
+                        UNION ALL
+                        SELECT user_id, movie_id, rating_value, logged_at AS ts
+                        FROM user_click_logs
+                        WHERE action_type = 'RATING'
+                        AND rating_value IS NOT NULL
+                        ) combined
+                    ORDER BY user_id, movie_id, ts DESC
                     """)
         return cur.fetchall()
     except Exception as e:
