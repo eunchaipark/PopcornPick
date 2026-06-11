@@ -5,12 +5,13 @@ from pyspark.sql import SparkSession
 
 spark = (
         SparkSession.builder \
-        .appName("popcornpick") \
+        .appName("PopcornPick") \
         .master("local[2]") \
         .config("spark.driver.memory", "2g") \
         .config("spark.sql.shuffle.partitions", "4") \
         .getOrCreate()
     )
+
 
 while True:
     try:

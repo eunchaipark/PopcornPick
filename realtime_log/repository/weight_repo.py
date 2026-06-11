@@ -1,27 +1,27 @@
 from db import get_connection
 from collections import defaultdict
 
-from pyspark.sql.functions import when, sum as spark_sum, exploded, split
+from pyspark.sql.functions import when, sum as spark_sum, explode, split
 
 def aggregate_spark(df):
     print(df.columns)
     # 장르가 여러개인 경우 split해서 가중치 부여  ex)액션,코미디라면 액션, 코미디 나눠서 부여
-    exploded_df = (
+    explode_df = (
         df.withColumn(
             "genre_name",
-            exploded(split("genres","|"))
+            explode(split("genres","\\|"))
         )
     )
     return (
-        exploded_df
+        explode_df
         .withColumn(
             "score",
-            when(df.action_type == "LIKE", 5)
-            .when(df.action_type == "RATING", df.rating_value * 3)
+            when(explode_df.action_type == "LIKE", 5)
+            .when(explode_df.action_type == "RATING", explode_df.rating_value * 3)
             .otherwise(1)
         ).groupBy(
             "user_id",
-            "genres"
+            "genre_name"
         ).agg(
             spark_sum("score").alias("weight")
         )
