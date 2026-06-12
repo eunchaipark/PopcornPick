@@ -19,7 +19,7 @@ def run_batch():
     print("배치 완료")
 
 
-interval = int(os.getenv('BATCH_INTERVAL_MINUTES', 60))
+interval = int(os.getenv('BATCH_INTERVAL_MINUTES', 1))
 scheduler = BlockingScheduler()
 scheduler.add_job(run_batch, 'interval', minutes=interval)
 
