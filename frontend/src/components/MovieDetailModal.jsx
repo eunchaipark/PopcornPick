@@ -63,7 +63,7 @@ const MovieDetailModal = ({movie, onClose}) => {
                         </div>
 
                         {movie.vote_average > 0 && (
-                            <p className={styles.voteAverage}>TMDB 평점: {movie.vote_average?.toFixed(1)}</p>
+                            <p className={styles.voteAverage}>영화 평점: {movie.vote_average?.toFixed(1)}</p>
                         )}
 
                         <div className={styles.ratingSection}>

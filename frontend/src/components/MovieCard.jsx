@@ -20,7 +20,7 @@ const MovieCard = ({ movie, rank, onClick }) => {
                     ))}
                 </div>
                 {movie.vote_average > 0 && (
-                    <p className={styles.rating}>TMDB {movie.vote_average?.toFixed(1)}</p>
+                    <p className={styles.rating}>평점: {movie.vote_average?.toFixed(1)}</p>
                 )}
                 {movie.score > 0 && (
                     <p className={styles.score}>선호도 {movie.score?.toFixed(2)}</p>
