@@ -5,16 +5,17 @@ import PopularMovies from '../components/PopularMovies'
 import MovieDetailModal from '../components/MovieDetailModal'
 import styles from '../styles/HomePage.module.css'
 import apiClient from '../api/apiClient'
+import useAuthStore from '../store/authStore'
 
 const HomePage = () => {
     const [selectedMovie, setSelectedMovie] = useState(null)
+    const { user } = useAuthStore()
 
-    // HomePage.jsx
     const handleMovieClick = async (movie) => {
         // 클릭 로그 전송
         try {
             await apiClient.post('/logs', {
-                user_id: 1,  // 임시
+                user_id: user?.user_id || 1,  // 로그인 유저 ID 동적 바인딩
                 movie_id: movie.movie_id,
                 genres: movie.genres,
                 action_type: 'CLICK'
@@ -36,7 +37,7 @@ const HomePage = () => {
             <hr className={styles.divider}/>
 
             <PersonalRecommendation
-                userId={1}
+                userId={user?.user_id || 1} // 로그인 유저 ID 동적 바인딩
                 onMovieClick={handleMovieClick}
             />
 
