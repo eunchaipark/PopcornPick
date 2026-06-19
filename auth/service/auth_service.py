@@ -1,5 +1,4 @@
-from typing import Optional
-from auth.repository.user_repo import create_user, get_user_by_email
+from auth.repository.user_repo import UserRepository
 import bcrypt
 from fastapi import HTTPException
 import jwt
@@ -34,7 +33,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     # TODO: 입력 비밀번호와 DB 해시 비밀번호의 일치 여부를 검증하세요.
     return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
 
-def register_user(username: str, email: str, password_raw: str) -> dict:
+def register_user(username: str, email: str, password_raw: str, db) -> dict:
     """
     회원가입의 비즈니스 논리를 처리합니다.
     1. 이메일 중복 체크
@@ -43,21 +42,22 @@ def register_user(username: str, email: str, password_raw: str) -> dict:
     """
     # TODO: 회원가입 성공 시 생성된 회원 정보를 딕셔너리 형태로 반환하세요.
     # 1
-    existing_user = get_user_by_email(email)
+    repo = UserRepository(db)
+    existing_user = repo.get_user_by_email(email)
     if existing_user:
         raise HTTPException(status_code=400, detail="이미 사용 중인 이메일입니다.")
     # 2
     password_hash = hash_password(password_raw)
     # 3
-    row = create_user(username, email, password_hash)
+    row = repo.create_user(username, email, password_hash)
     return {
-        "user_id": row[0],
-        "email": row[1],
-        "username": row[2],
-        "created_at": row[3]
+        "user_id": row["user_id"],
+        "email": row["email"],
+        "username": row["username"],
+        "created_at": row["created_at"]
     }
 
-def authenticate_user(email: str, password_raw: str) -> dict:
+def authenticate_user(email: str, password_raw: str, db) -> dict:
     """
     로그인(인증)의 비즈니스 논리를 처리합니다.
     1. 이메일로 사용자 조회
@@ -65,16 +65,17 @@ def authenticate_user(email: str, password_raw: str) -> dict:
     3. 성공 시 사용자 정보 딕셔너리 반환
     """
     # 1
-    user = get_user_by_email(email)
+    repo = UserRepository(db)
+    user = repo.get_user_by_email(email)
     if not user:
         raise HTTPException(status_code=401, detail="존재하지 않는 이메일입니다.")
     # 2
-    is_valid = verify_password(password_raw, user[3])
+    is_valid = verify_password(password_raw, user["password"])
     if not is_valid:
         raise HTTPException(status_code=401, detail="비밀번호가 일치하지 않습니다.")
     # 3
     return {
-        "user_id": user[0],
-        "username": user[1],
-        "email": user[2]
+        "user_id": user["user_id"],
+        "username": user["username"],
+        "email": user["email"]
     }
