@@ -91,3 +91,17 @@ CREATE TABLE recommendations (
 
 CREATE INDEX idx_rec_user_rank  ON recommendations (user_id, rank);
 CREATE INDEX idx_rec_user_batch ON recommendations (user_id, batch_run_at DESC);
+
+
+CREATE TABLE chat_histories (
+    chat_id    BIGSERIAL    PRIMARY KEY,
+    session_id VARCHAR(64)  NOT NULL,
+    user_id    INT          REFERENCES users(user_id),
+    role       VARCHAR(10)  NOT NULL CHECK (role IN ('user', 'assistant')),
+    content    TEXT         NOT NULL,
+    rag_context JSONB       DEFAULT NULL,
+    created_at TIMESTAMP(3) DEFAULT NOW()
+);
+
+CREATE INDEX idx_chat_session ON chat_histories (session_id, created_at DESC);
+CREATE INDEX idx_chat_user    ON chat_histories (user_id, created_at DESC);
