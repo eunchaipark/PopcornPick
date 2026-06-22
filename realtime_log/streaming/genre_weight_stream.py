@@ -1,7 +1,8 @@
 from time import sleep
-from realtime_log.repository.offset_repo import get_last_offset, update_offset, get_current_max_id, load_logs_spark
+from realtime_log.repository.offset_repo import get_last_offset, update_offset, get_current_max_id, load_logs_spark, load_rating_history_spark
 from realtime_log.repository.weight_repo import aggregate_spark, upsert_weights
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 
 spark = (
         SparkSession.builder \
@@ -32,8 +33,24 @@ while True:
             sleep(20)
             continue
 
+        #기존 입력된 별점여부 확인
+        targets = (
+            df.select("user_id", "movie_id")
+            .distinct()
+        )
+        history_df = (
+            #spark.read.table("user_click_logs")
+            load_rating_history_spark(spark)
+            #.filter(col("action_type") == "RATING")
+            .join(
+                targets,
+                ["user_id", "movie_id"],
+                "inner"
+            )
+        )            
+
         #가중치 부여
-        result_df = aggregate_spark(df)
+        result_df = aggregate_spark(df, history_df)
 
         upsert_weights(result_df)
         

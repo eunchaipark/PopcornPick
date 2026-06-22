@@ -60,9 +60,11 @@ def load_logs_spark(spark, last_offset, max_log_id):
                 SELECT
                     log_id,
                     user_id,
+                    movie_id,
                     action_type,
                     genres,
-                    rating_value
+                    rating_value,
+                    logged_at
                 FROM user_click_logs
                 WHERE log_id > {last_offset}
                   AND log_id <= {max_log_id}
@@ -96,3 +98,28 @@ def update_offset(last_log_id):
     finally:
         cur.close()
         conn.close()
+
+
+def load_rating_history_spark(spark):
+    return (
+        spark.read
+        .format("jdbc")
+        .option("url", JDBC_URL)
+        .option("dbtable", f"""(
+                    SELECT  log_id,
+                            user_id,
+                            movie_id,
+                            rating_value,
+                            logged_at
+                    FROM user_click_logs
+                    WHERE action_type = 'RATING'
+                ) t
+                """)
+        .option("user", DB_USER)
+        .option("password", DB_PASSWORD)
+        .option(
+            "driver",
+            "org.postgresql.Driver"
+        )
+        .load()
+    )
