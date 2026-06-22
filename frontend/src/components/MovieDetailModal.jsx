@@ -1,15 +1,33 @@
-import {useState} from 'react'
+import { useState, useEffect } from 'react'
 import apiClient from '../api/apiClient'
 import useAuthStore from '../store/authStore'
 import styles from '../styles/MovieDetailModal.module.css'
 
-const MovieDetailModal = ({movie, onClose}) => {
-    const {user} = useAuthStore()
+const MovieDetailModal = ({ movie, onClose }) => {
+    const { user } = useAuthStore()
     const [rating, setRating] = useState(0)
     const [liked, setLiked] = useState(false)
     const [message, setMessage] = useState('')
 
     if (!movie) return null
+
+    useEffect(() => {
+        if (!movie || !user) return
+        const fetchState = async () => {
+            try {
+                const res = await apiClient.get(
+                    `/recommendations/user-state/${user.user_id}/${movie.movie_id}`
+                )
+                setRating(res.data.rating || 0)
+                setLiked(res.data.liked)
+                if (res.data.rating) setMessage(`이전에 ${res.data.rating}점을 매기셨어요!`)
+                if (res.data.liked) setMessage('이미 찜한 영화예요 ❤️')
+            } catch (err) {
+                console.error('상태 조회 실패:', err)
+            }
+        }
+        fetchState()
+    }, [movie])
 
     const sendLog = async (action_type, rating_value = null) => {
         try {
