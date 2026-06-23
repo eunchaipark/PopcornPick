@@ -6,9 +6,11 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
 import styles from './styles/App.module.css'
+import ChatBot from './components/ChatBot'
 
 const PrivateRoute = ({ children }) => {
-    const { isLoggedIn } = useAuthStore()
+    const { isLoggedIn, isInitialized } = useAuthStore()
+    if (!isInitialized) return null
     return isLoggedIn ? children : <Navigate to="/login" replace />
 }
 
@@ -23,6 +25,7 @@ const App = () => {
         <BrowserRouter>
             <div className={styles.app}>
                 <Header />
+                <ChatBot />
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
