@@ -20,7 +20,7 @@ Apache Spark(분산 처리)와 FastAPI(비동기 백엔드)를 결합하여, 유
 ## 시스템 아키텍처
 
 ```
-아키텍처 이미지 넣어야함
+![Embedding Benchmark](./docs/images/Architecture.png)
 ```
 
 ---
@@ -234,7 +234,7 @@ k=60 상수: 낮은 순위 문서의 영향력을 완화하는 역할
 ## DB
 
 ```
-DB 이미지 넣는다
+![Embedding Benchmark](./docs/images/db.png)
 ```
 
 ---
